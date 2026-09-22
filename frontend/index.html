@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Transit Sense — Automated Public Transport Information Agent</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><rect width=%2224%22 height=%2224%22 rx=%226%22 fill=%22%23F2A93B%22/><path d=%22M6 16h12M8 16v2M16 16v2M7 8h10a1 1 0 0 1 1 1v5H6V9a1 1 0 0 1 1-1zM9 4h6v4H9z%22 stroke=%22%2312171B%22 stroke-width=%221.4%22 fill=%22none%22/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" width="34" height="34">
+          <rect x="1" y="1" width="38" height="38" rx="9" fill="#F2A93B"/>
+          <path d="M11 26h18M14 26v3M26 26v3M12 12h16a2 2 0 0 1 2 2v9H10v-9a2 2 0 0 1 2-2z" fill="none" stroke="#12171B" stroke-width="2.1"/>
+          <circle cx="15" cy="19" r="1.6" fill="#12171B"/>
+          <circle cx="25" cy="19" r="1.6" fill="#12171B"/>
+          <path d="M16 8h8v4h-8z" fill="none" stroke="#12171B" stroke-width="2.1"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Transit Sense</span>
+        <span class="brand-sub">route &amp; schedule agent</span>
+      </div>
+    </div>
+
+    <button class="new-chat-btn" id="newChatBtn" type="button">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      New inquiry
+    </button>
+
+    <div class="sidebar-section">
+      <p class="sidebar-label">Quick queries</p>
+      <div class="chip-list" id="chipList">
+        <button class="chip" data-mode="bus">
+          <span class="chip-badge chip-badge--bus">B</span> Bus routes near a place
+        </button>
+        <button class="chip" data-mode="rail">
+          <span class="chip-badge chip-badge--rail">R</span> Train schedule &amp; delays
+        </button>
+        <button class="chip" data-mode="metro">
+          <span class="chip-badge chip-badge--metro">M</span> Metro fare &amp; zones
+        </button>
+        <button class="chip" data-mode="alert">
+          <span class="chip-badge chip-badge--alert">!</span> Live service alerts
+        </button>
+        <button class="chip" data-mode="trip">
+          <span class="chip-badge chip-badge--trip">T</span> Plan a trip A → B
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="status-row" id="statusRow">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Checking agent status…</span>
+      </div>
+      <div class="power-row">
+        <span class="power-pill">Groq · LLM reasoning</span>
+        <span class="power-pill">Tavily · live search</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <header class="board-header">
+      <div class="board-header-left">
+        <h1>Transit Sense</h1>
+        <p>Automated Public Transport Information Agent</p>
+      </div>
+      <div class="board-header-right">
+        <div class="mode-dots" title="Multi-modal: bus, rail, metro">
+          <span class="dot dot--bus"></span>
+          <span class="dot dot--rail"></span>
+          <span class="dot dot--metro"></span>
+        </div>
+        <div class="clock" id="clock">--:--:--</div>
+      </div>
+    </header>
+
+    <section class="chat-viewport" id="chatViewport">
+      <div class="chat-scroll" id="chatScroll">
+
+        <div class="board-welcome" id="boardWelcome">
+          <div class="flap-line">
+            <span class="flap-char">A</span><span class="flap-char">S</span><span class="flap-char">K</span>
+            <span class="flap-gap"></span>
+            <span class="flap-char">A</span><span class="flap-char">B</span><span class="flap-char">O</span><span class="flap-char">U</span><span class="flap-char">T</span>
+          </div>
+          <p class="welcome-copy">
+            Ask about a bus route, a train timetable, a service delay, a fare, or how to get
+            from one place to another. Transit Sense checks the live web through Tavily before
+            answering anything that can change day to day.
+          </p>
+          <p class="welcome-hint">Tip: mention your city and route number for the sharpest answer — e.g. “Is the Delhi Metro Yellow Line running on time right now?”</p>
+        </div>
+
+        <!-- messages get appended here by script.js -->
+      </div>
+    </section>
+
+    <footer class="composer">
+      <form id="composerForm" class="composer-form">
+        <textarea
+          id="composerInput"
+          class="composer-input"
+          placeholder="Ask about a route, delay, fare, or trip…"
+          rows="1"
+          maxlength="1000"
+        ></textarea>
+        <button type="submit" class="send-btn" id="sendBtn" aria-label="Send">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12h15M13 6l6 6-6 6"/>
+          </svg>
+        </button>
+      </form>
+      <p class="composer-hint">Enter to send · Shift + Enter for a new line</p>
+    </footer>
+
+  </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
